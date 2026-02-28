@@ -9,11 +9,8 @@ function HelperText() {
     if (activeTool === "box") {
       return "Box tool: click the canvas to place a new box.";
     }
-    if (activeTool === "text") {
-      return "Text tool: click the canvas to place new text.";
-    }
-    if (activeTool === "arrow") {
-      return "Arrow tool: drag from one node handle to another to connect.";
+    if (activeTool === "note") {
+      return "Note tool: click the canvas to place new note.";
     }
     return "Select tool: move nodes, pan, and double-click a node to edit text.";
   }, [activeTool]);

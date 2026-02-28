@@ -23,11 +23,8 @@ function App() {
         case "b":
           setActiveTool("box");
           break;
-        case "a":
-          setActiveTool("arrow");
-          break;
-        case "t":
-          setActiveTool("text");
+        case "n":
+          setActiveTool("note");
           break;
         default:
           break;

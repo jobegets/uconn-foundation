@@ -1,4 +1,4 @@
-export type Tool = "select" | "box" | "arrow" | "text";
+export type Tool = "select" | "box" | "note";
 
 export const TOOL_BUTTONS: Array<{
   tool: Tool;
@@ -7,6 +7,5 @@ export const TOOL_BUTTONS: Array<{
 }> = [
   { tool: "select", label: "Select", hotkey: "V" },
   { tool: "box", label: "Box", hotkey: "B" },
-  { tool: "arrow", label: "Arrow", hotkey: "A" },
-  { tool: "text", label: "Text", hotkey: "T" },
+  { tool: "note", label: "Note", hotkey: "N" },
 ];

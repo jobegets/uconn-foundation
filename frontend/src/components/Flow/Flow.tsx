@@ -3,89 +3,87 @@ import {
   ReactFlow,
   Background,
   Controls,
-  Handle,
   MarkerType,
-  Position,
   addEdge,
   useEdgesState,
   useNodesState,
   type Connection,
   type Edge,
-  type Node,
-  type NodeProps,
-  type NodeMouseHandler,
   type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useToolContext } from "../../context/useToolContext";
-import { BOX_STYLE, TEXT_STYLE } from "./styles";
-
-type SketchKind = "box" | "text";
-type SketchNodeData = { label: string; kind: SketchKind };
-type SketchNode = Node<SketchNodeData>;
-type SketchEdge = Edge;
-
-export function SketchNodeComponent({ data }: NodeProps<SketchNode>) {
-  return (
-    <div className={`sketch-node sketch-node--${data.kind}`}>
-      <Handle type="target" position={Position.Left} />
-      <div className="sketch-node__label">{data.label}</div>
-      <Handle type="source" position={Position.Right} />
-    </div>
-  );
-}
+import { SummaryNode } from "./Nodes/SummaryNode";
+import { NoteNode, PLACEHOLDER_TEXT } from "./Nodes/NoteNode";
+import "./Nodes/styles.css";
+import type { Tool } from "../../constants/react-flow";
 
 const nodeTypes = {
-  sketch: SketchNodeComponent,
+  summary: SummaryNode,
+  note: NoteNode,
 };
 
-const initialNodes: SketchNode[] = [
+type NodeTypes = SummaryNode | NoteNode;
+
+const Node = {
+  Summary: "summary",
+  Note: "note",
+} as const;
+
+const initialNodes: NodeTypes[] = [
   {
     id: "node-1",
-    type: "sketch",
+    type: Node.Summary,
     position: { x: 220, y: 180 },
-    data: { label: "Start here", kind: "box" },
-    style: BOX_STYLE,
+    data: { label: "Start here", summary: "hi" },
   },
 ];
 
 function Flow() {
   const { activeTool } = useToolContext();
   const [nodes, setNodes, onNodesChange] =
-    useNodesState<SketchNode>(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<SketchEdge>([]);
+    useNodesState<NodeTypes>(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<
-    SketchNode,
-    SketchEdge
+    NodeTypes,
+    Edge
   > | null>(null);
   const idCounterRef = useRef(initialNodes.length + 1);
-
-  const defaultEdgeOptions = useMemo(
-    () => ({
-      type: "straight",
-      markerEnd: { type: MarkerType.ArrowClosed, color: "#111827" },
-      style: { stroke: "#111827", strokeWidth: 2 },
-    }),
-    [],
-  );
+  const isElementsSelectable = activeTool === "select";
+  const shouldPanOnDrag = activeTool === "select";
+  const shouldSelectionOnDrag = activeTool === "select";
 
   const createNode = useCallback(
-    (kind: SketchKind, clickPosition: { x: number; y: number }) => {
+    (activeTool: Tool, clickPosition: { x: number; y: number }) => {
       const id = `node-${idCounterRef.current}`;
-      const nextNode: SketchNode = {
-        id,
-        type: "sketch",
-        position: {
-          x: kind === "box" ? clickPosition.x - 95 : clickPosition.x - 10,
-          y: kind === "box" ? clickPosition.y - 50 : clickPosition.y - 15,
-        },
-        data: {
-          label: `${kind === "box" ? "Box" : "Text"} ${idCounterRef.current}`,
-          kind,
-        },
-        style: kind === "box" ? BOX_STYLE : TEXT_STYLE,
-      };
 
+      let nextNode: NodeTypes;
+      if (activeTool === "box") {
+        nextNode = {
+          id,
+          type: Node.Summary,
+          position: {
+            x: clickPosition.x - 95,
+            y: clickPosition.y - 50,
+          },
+          data: {
+            label: "",
+            summary: "hi",
+          },
+        };
+      } else if (activeTool === "note") {
+        nextNode = {
+          id,
+          type: Node.Note,
+          position: {
+            x: clickPosition.x - 95,
+            y: clickPosition.y - 50,
+          },
+          data: {
+            summary: PLACEHOLDER_TEXT,
+          },
+        };
+      }
       idCounterRef.current += 1;
       setNodes((currentNodes) => [...currentNodes, nextNode]);
     },
@@ -94,7 +92,7 @@ function Flow() {
 
   const onPaneClick = useCallback(
     (event: MouseEvent) => {
-      if (!flowInstance || (activeTool !== "box" && activeTool !== "text")) {
+      if (!flowInstance || (activeTool !== "box" && activeTool !== "note")) {
         return;
       }
 
@@ -109,44 +107,9 @@ function Flow() {
 
   const onConnect = useCallback(
     (connection: Connection) => {
-      if (activeTool !== "arrow") {
-        return;
-      }
-
-      setEdges((currentEdges) =>
-        addEdge({ ...connection, ...defaultEdgeOptions }, currentEdges),
-      );
+      setEdges((currentEdges) => addEdge({ ...connection }, currentEdges));
     },
-    [activeTool, defaultEdgeOptions, setEdges],
-  );
-
-  const onNodeDoubleClick = useCallback<NodeMouseHandler<SketchNode>>(
-    (_event, node) => {
-      const promptMessage =
-        node.data.kind === "box" ? "Rename box:" : "Edit text:";
-      const nextLabel = window.prompt(promptMessage, node.data.label);
-
-      if (nextLabel === null) {
-        return;
-      }
-
-      const trimmedLabel = nextLabel.trim();
-      if (!trimmedLabel) {
-        return;
-      }
-
-      setNodes((currentNodes) =>
-        currentNodes.map((currentNode) =>
-          currentNode.id === node.id
-            ? {
-                ...currentNode,
-                data: { ...currentNode.data, label: trimmedLabel },
-              }
-            : currentNode,
-        ),
-      );
-    },
-    [setNodes],
+    [setEdges],
   );
 
   return (
@@ -159,13 +122,11 @@ function Flow() {
       onEdgesChange={onEdgesChange}
       onPaneClick={onPaneClick}
       onConnect={onConnect}
-      onNodeDoubleClick={onNodeDoubleClick}
       fitView
-      defaultEdgeOptions={defaultEdgeOptions}
-      nodesConnectable={activeTool === "arrow"}
-      elementsSelectable={activeTool === "select" || activeTool === "arrow"}
-      selectionOnDrag={activeTool === "select"}
-      panOnDrag={activeTool === "select" || activeTool === "arrow"}
+      nodesConnectable
+      elementsSelectable={isElementsSelectable}
+      selectionOnDrag={shouldSelectionOnDrag}
+      panOnDrag={shouldPanOnDrag}
       className="canvas"
     >
       <Background gap={20} size={1.1} color="#d6dce5" />
