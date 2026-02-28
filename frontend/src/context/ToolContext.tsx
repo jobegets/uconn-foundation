@@ -8,9 +8,12 @@ type ToolProviderProps = {
 
 export function ToolProvider({ children }: ToolProviderProps) {
   const [activeTool, setActiveTool] = useState<Tool>("select");
+  const [loadingState, setLoadingState] = useState<boolean>(false);
 
   return (
-    <ToolContext.Provider value={{ activeTool, setActiveTool }}>
+    <ToolContext.Provider
+      value={{ activeTool, setActiveTool, loadingState, setLoadingState }}
+    >
       {children}
     </ToolContext.Provider>
   );

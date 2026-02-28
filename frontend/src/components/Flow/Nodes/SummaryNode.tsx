@@ -7,6 +7,7 @@ import {
   buildGraphFromSummaryTree,
   type SummaryTree,
 } from "../../../helpers/treeHelpers";
+import { useToolContext } from "../../../context/useToolContext";
 
 type SummaryNodeData = { label: string; summary: string };
 export type SummaryNode = Node<SummaryNodeData>;
@@ -14,6 +15,7 @@ export type SummaryNode = Node<SummaryNodeData>;
 export function SummaryNode({ id, data }: NodeProps<SummaryNode>) {
   // OK I REALIZED HALFWAY I DID NOT NEED NEW CONTEXT ITS LITERALLY PROVIDED BY FLOW
   const { nodes, edges, setNodes, setEdges } = useFlowGraphContext();
+  const { loadingState, setLoadingState } = useToolContext();
   const [isOpen, setIsOpen] = useState(false);
   const [editingField, setEditingField] = useState<"label" | "summary" | null>(
     null,
@@ -51,6 +53,7 @@ export function SummaryNode({ id, data }: NodeProps<SummaryNode>) {
   };
 
   const handleSpawnChildren = async () => {
+    setLoadingState(true);
     const prompt = `What is ${data.label.trim()}`;
     if (!prompt) {
       return;
@@ -66,6 +69,7 @@ export function SummaryNode({ id, data }: NodeProps<SummaryNode>) {
 
     setNodes(newNodes);
     setEdges(newEdges);
+    setLoadingState(false);
   };
 
   return (

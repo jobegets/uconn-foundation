@@ -7,9 +7,11 @@ import {
   type SummaryTree,
 } from "../../helpers/treeHelpers";
 import { getStudyMapChildren } from "../../api";
+import { useToolContext } from "../../context/useToolContext";
 
 function ChatWindow() {
   const { nodes, edges, setNodes, setEdges } = useFlowGraphContext();
+  const { loadingState, setLoadingState } = useToolContext();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
@@ -45,7 +47,7 @@ function ChatWindow() {
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    setLoadingState(true);
     const prompt = message.trim();
     if (!prompt) return;
 
@@ -61,6 +63,8 @@ function ChatWindow() {
     );
     setNodes(newNodes);
     setEdges(newEdges);
+
+    setLoadingState(false);
   };
 
   return (
