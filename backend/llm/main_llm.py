@@ -29,7 +29,7 @@ def handle_chat(user_prompt : str):
         parent_topics = find_important(parent_summary)
 
         for topic in parent_topics:
-            child_total_summary = generate_summary(topic).split('\n')
+            child_total_summary = generate_summary(topic, parent_topic).split('\n')
             child_topic = child_total_summary[0].strip().capitalize()
             child_summary = child_total_summary[1]
 
