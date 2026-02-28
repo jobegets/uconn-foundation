@@ -1,3 +1,4 @@
+import json
 from typing import Dict
 from generate_summary import generate_summary
 from find_important import find_important
@@ -32,5 +33,10 @@ def handle_chat(user_prompt : str):
         child_summary = child_total_summary[1]
 
         child = Child(child_topic, child_summary)
+        #jjson_child = json.dumps(child.__dict__, indent=2)
         
-        parent.children.append(vars(child))
+        parent.children.append(child.__dict__)
+
+    json_parent = json.dumps(parent.__dict__, indent=2)
+    return json_parent
+
