@@ -68,7 +68,7 @@ export function NoteNode({ id, data }: NodeProps<NoteNode>) {
           </p>
         )}
       </div>
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="target" position={Position.Bottom} />
     </div>
   );
 }

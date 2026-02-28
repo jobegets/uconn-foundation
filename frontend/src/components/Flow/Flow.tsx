@@ -4,8 +4,6 @@ import {
   Background,
   Controls,
   addEdge,
-  useEdgesState,
-  useNodesState,
   type Connection,
   type Edge,
   type ReactFlowInstance,
@@ -16,38 +14,28 @@ import { SummaryNode } from "./Nodes/SummaryNode";
 import { NoteNode, PLACEHOLDER_TEXT } from "./Nodes/NoteNode";
 import "./Nodes/styles.css";
 import type { Tool } from "../../constants/react-flow";
+import { useFlowGraphContext } from "../../context/useFlowGraphContext";
+import type { FlowNode } from "../../context/flow-graph-context";
 
 const nodeTypes = {
   summary: SummaryNode,
   note: NoteNode,
 };
 
-type NodeTypes = SummaryNode | NoteNode;
-
 const Node = {
   Summary: "summary",
   Note: "note",
 } as const;
 
-const initialNodes: NodeTypes[] = [
-  {
-    id: "node-1",
-    type: Node.Summary,
-    position: { x: 220, y: 180 },
-    data: { label: "Start here", summary: "hi" },
-  },
-];
-
 function Flow() {
   const { activeTool } = useToolContext();
-  const [nodes, setNodes, onNodesChange] =
-    useNodesState<NodeTypes>(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
+    useFlowGraphContext();
   const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<
-    NodeTypes,
+    FlowNode,
     Edge
   > | null>(null);
-  const idCounterRef = useRef(initialNodes.length + 1);
+  const idCounterRef = useRef(nodes.length + 1);
   const isElementsSelectable = activeTool === "select";
   const shouldPanOnDrag = activeTool === "select";
   const shouldSelectionOnDrag = activeTool === "select";
@@ -56,7 +44,7 @@ function Flow() {
     (activeTool: Tool, clickPosition: { x: number; y: number }) => {
       const id = `node-${idCounterRef.current}`;
 
-      let nextNode: NodeTypes;
+      let nextNode: FlowNode;
       if (activeTool === "box") {
         nextNode = {
           id,

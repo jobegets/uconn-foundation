@@ -3,6 +3,7 @@ import "@xyflow/react/dist/style.css";
 import "./App.css";
 import Flow from "./components/Flow/Flow";
 import HelperText from "./components/HelperText/HelperText";
+import ChatWindow from "./components/ChatWindow/ChatWindow";
 import Tools from "./components/Tools/Tools";
 import { useToolContext } from "./context/useToolContext";
 
@@ -42,6 +43,7 @@ function App() {
       <Flow />
       <HelperText />
       <div className="canvas-surface"></div>
+      <ChatWindow />
     </div>
   );
 }
