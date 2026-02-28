@@ -17,6 +17,7 @@ CONTEXT : str = (
     "- One topic per line\n"
     "- No explanations\n"
     "- No numbering\n"
+    "- Try to minimize the amount of selected terms\n"
     "- Maximum 8 topics\n"
     "- NO ADDITIONAL TEXT\n"
     "\n"
