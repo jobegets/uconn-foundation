@@ -1,4 +1,3 @@
-import json
 from typing import Dict
 from .generate_summary import generate_summary
 from .find_important import find_important
@@ -13,9 +12,6 @@ class Parent(Child):
         super().__init__(topic, summary)
         #self.children : list[Child] | list[Dict] = children or []
         self.children = children or []
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
 
 def handle_chat(user_prompt : str):
     try:
