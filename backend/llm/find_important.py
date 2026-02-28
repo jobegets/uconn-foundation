@@ -38,7 +38,7 @@ def find_important(summary : str) -> list[str]:
             model="openai/gpt-oss-120b",
             messages=message,
             max_completion_tokens=500,
-            temperature=0.4,
+            temperature=0.2,
         )
 
         parsed_response = str(response.choices[0].message.content)
