@@ -21,7 +21,7 @@ function ChatWindow() {
         return;
       }
 
-      if (event.key === "=") {
+      if (event.key === "/") {
         event.preventDefault();
         setIsOpen((currentState) => !currentState);
       }
