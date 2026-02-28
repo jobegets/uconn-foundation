@@ -142,16 +142,20 @@ function ChatWindow() {
     return null;
   }
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const prompt = message.trim();
     if (!prompt) return;
 
-    const { nodes, edges } = buildGraphFromSummaryTree(MOCK_DATA);
+    setMessage("");
+    const response = await fetch(
+      `https://uconn-foundation-backend.vercel.app/studymap?prompt=${prompt}`,
+    );
+    const data = await response.json();
+    const { nodes, edges } = buildGraphFromSummaryTree(data);
     setNodes(nodes);
     setEdges(edges);
-    setMessage("");
   };
 
   return (

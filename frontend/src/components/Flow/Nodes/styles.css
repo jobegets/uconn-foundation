@@ -4,6 +4,7 @@
 .summary-node {
   position: relative;
   min-width: 220px;
+  max-width: 360px;
   border-radius: 14px;
 }
 
@@ -23,6 +24,7 @@
 
 .note-node__paper {
   min-height: 140px;
+  max-width: 360px;
   padding: 16px 14px 14px;
   border: 2px solid #facc15;
   border-radius: 12px;
@@ -49,8 +51,11 @@
 
 .note-node__text {
   margin: 0;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #3f3f46;
-  white-space: pre-wrap;
   font-size: 14px;
   line-height: 1.45;
   cursor: text;
@@ -63,7 +68,7 @@
 }
 
 .note-node__editor {
-  width: 100%;
+  width: min(100%, 320px);
   min-height: 86px;
   border: 1px solid #f59e0b;
   border-radius: 8px;
@@ -78,6 +83,8 @@
 /* SUMMARY NODE */
 
 .summary-node {
+  display: flex;
+  flex-direction: column;
   padding: 12px;
   border: 1px solid #cbd5e1;
   background: rgba(255, 255, 255, 0.94);
@@ -91,6 +98,11 @@
 }
 
 .summary-node__label {
+  display: inline-block;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #0f172a;
   font-size: 13px;
   font-weight: 700;
@@ -100,7 +112,7 @@
 }
 
 .summary-node__label-input {
-  width: 100%;
+  width: min(100%, 320px);
   padding: 6px 8px;
   border: 1px solid #94a3b8;
   border-radius: 8px;
@@ -114,7 +126,11 @@
 }
 
 .summary-node__dropdown {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   margin-top: 8px;
+  min-height: 0;
 }
 
 .summary-node__toggle {
@@ -141,20 +157,24 @@
 }
 
 .summary-node__content {
+  flex: 1;
   margin: 0 0;
   padding: 10px;
   border-radius: 10px;
+  min-height: 110px;
+  max-width: 320px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  white-space: normal;
   background: #f8fafc;
   color: #334155;
-  min-width: fit-content;
-  white-space: pre-wrap;
   font-size: 13px;
   line-height: 1.45;
   cursor: text;
 }
 
 .summary-node__editor {
-  width: 100%;
+  width: min(100%, 320px);
   min-height: 100px;
   margin-top: 8px;
   padding: 10px;
