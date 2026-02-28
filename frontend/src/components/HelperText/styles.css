@@ -1,0 +1,24 @@
+.helper-note {
+  position: absolute;
+  top: 92px;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  width: min(92vw, 560px);
+  padding: 7px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #334155;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+}
+
+@media (max-width: 720px) {
+  .helper-note {
+    top: 132px;
+    width: calc(100% - 30px);
+    font-size: 12px;
+  }
+}

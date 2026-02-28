@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from "react";
+import "@xyflow/react/dist/style.css";
+import "./App.css";
+import Flow from "./components/Flow/Flow";
+import HelperText from "./components/HelperText/HelperText";
+import Tools from "./components/Tools/Tools";
+import { useToolContext } from "./context/useToolContext";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { activeTool, setActiveTool } = useToolContext();
+
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      const focusedTag = (event.target as HTMLElement | null)?.tagName;
+      if (focusedTag === "INPUT" || focusedTag === "TEXTAREA") {
+        return;
+      }
+
+      switch (event.key.toLowerCase()) {
+        case "v":
+          setActiveTool("select");
+          break;
+        case "b":
+          setActiveTool("box");
+          break;
+        case "a":
+          setActiveTool("arrow");
+          break;
+        case "t":
+          setActiveTool("text");
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeydown);
+    return () => window.removeEventListener("keydown", handleKeydown);
+  }, [setActiveTool]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className={`sketch-app sketch-app--${activeTool}`}>
+      <Tools />
+      <Flow />
+      <HelperText />
+      <div className="canvas-surface"></div>
+    </div>
+  );
 }
 
-export default App
+export default App;
