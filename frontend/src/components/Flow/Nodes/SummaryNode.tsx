@@ -112,8 +112,8 @@ export function SummaryNode({ id, data }: NodeProps<SummaryNode>) {
           </p>
         )}
       </details>
-      <Handle type="target" position={Position.Left} />
-      <Handle type="source" position={Position.Right} />
+      <Handle type="source" position={Position.Top} />
+      <Handle type="target" position={Position.Bottom} />
     </div>
   );
 }

@@ -48,7 +48,6 @@ export function NoteNode({ id, data }: NodeProps<NoteNode>) {
 
   return (
     <div className="note-node">
-      <Handle type="target" position={Position.Left} />
       <div className="note-node__paper">
         <div className="note-node__header">Scratchpad</div>
         {isEditingSummary ? (
@@ -69,7 +68,7 @@ export function NoteNode({ id, data }: NodeProps<NoteNode>) {
           </p>
         )}
       </div>
-      <Handle type="source" position={Position.Right} />
+      <Handle type="source" position={Position.Bottom} />
     </div>
   );
 }

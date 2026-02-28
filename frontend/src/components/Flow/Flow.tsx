@@ -129,7 +129,7 @@ function Flow() {
       className="canvas"
     >
       <Background gap={20} size={1.1} color="#d6dce5" />
-      <Controls position="bottom-right" showInteractive={false} />
+      <Controls position="bottom-right" showInteractive={true} />
     </ReactFlow>
   );
 }
