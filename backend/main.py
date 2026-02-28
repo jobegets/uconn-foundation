@@ -6,6 +6,7 @@ app = FastAPI()
 @app.get("/")
 def root():
     return 'poop'
+#poop?
 
 @app.get("/studymap")
 def read_root(prompt: str):
