@@ -18,7 +18,8 @@ CONTEXT : str = (
     "- No explanations\n"
     "- No numbering\n"
     "- Try to minimize the amount of selected terms\n"
-    "- Maximum 8 topics\n"
+    "- Pick 1-8 topics\n"
+    "- Avoid picking topics that duplicate the core topic\n"
     "- NO ADDITIONAL TEXT\n"
     "\n"
     "For example, if the summary is about evaporation, a response would be\n"
@@ -26,10 +27,11 @@ CONTEXT : str = (
     "states of matter\n"
 )
 
-def find_important(user_prompt : str) -> list[str]:
+def find_important(summary : str) -> list[str]:
     message = []
     message.append({"role": "system", "content": CONTEXT})
-    message.append({"role": "user", "content": user_prompt})
+    message.append({"role": "user", "content": summary})
+
 
     try:
         response : ChatCompletion = client.chat.completions.create(

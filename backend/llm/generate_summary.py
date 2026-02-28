@@ -16,16 +16,22 @@ CONTEXT : str = (
     "Guidelines:\n"
     " - Begin the first line with the subject and the next line will be the entire summary\n"
     " - Make sure to include essential foundational terms that the user should know.\n"
-    " - Maximum 4 sentences\n"
-    " - Minimize the amount of term usage\n"
+    " - Explain the bare minimum and include bare minimum terms\n"
+    " - Minimize the definition as much as possible\n"
+    " - Have 1-6 sentences\n"
+    " - Minimize the amount of term generated\n"
     " - Use only ASCII text\n"
     " - Do NOT include formulas and symbols\n"
 )
 
-def generate_summary(user_prompt : str) -> str:
+def generate_summary(user_prompt : str, prior_parent=None) -> str:
     message = []
     message.append({"role": "system", "content": CONTEXT})
     message.append({"role": "user", "content": user_prompt})
+
+    # maintain context, parent term
+    if(prior_parent): 
+        message.append({"role": "assistant", "content": f'This is in relation to {prior_parent}'})
 
     try:
         response : ChatCompletion = client.chat.completions.create(
