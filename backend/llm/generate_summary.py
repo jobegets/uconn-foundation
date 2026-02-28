@@ -14,9 +14,11 @@ CONTEXT : str = (
     "You are part of an AI assistant tasked with generating structured study roadmaps.\n"
     "The user will provide a prompt and you will provide a brief yet simple paragraph of that subject.\n"
     "Guidelines:\n"
-    " - Make sure to include key foundational terms that the user should know.\n"
+    " - Make sure to include essential foundational terms that the user should know.\n"
     " - Use only ASCII text\n"
     " - Begin the first line with the subject and the next line will be the entire summary\n"
+    " - Break down complex topics into simpler sentences and terms\n"
+    " - Do NOT include formulas and symbols\n"
 )
 
 def generate_summary(user_prompt : str) -> str:
