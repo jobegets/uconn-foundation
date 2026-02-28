@@ -39,23 +39,31 @@ function buildGraphFromRoot(
 ): { newNodes: FlowNode[]; newEdges: Edge[] } {
   const newNodes: FlowNode[] = [];
   const newEdges: Edge[] = [];
-  const depthIndex = new Map<number, number>();
+  let nodeIdCounter = 0;
+  let nextLeafX = START_X;
 
-  const traverse = (
-    node: SummaryTree,
-    parentId: string | null,
-    depth: number,
-  ) => {
-    const indexAtDepth = depthIndex.get(depth) ?? 0;
-    depthIndex.set(depth, indexAtDepth + 1);
+  const traverse = (node: SummaryTree, parentId: string | null, depth: number): number => {
+    const nodeId = `summary-${nodeIdCounter}`;
+    nodeIdCounter += 1;
 
-    const nodeId = `summary-${depth}-${indexAtDepth}`;
+    const childPositions = (node.children ?? []).map((child) =>
+      traverse(child, nodeId, depth + 1),
+    );
+
+    const x =
+      childPositions.length === 0
+        ? nextLeafX
+        : (childPositions[0] + childPositions[childPositions.length - 1]) / 2;
+
+    if (childPositions.length === 0) {
+      nextLeafX += X_GAP;
+    }
 
     newNodes.push({
       id: nodeId,
       type: "summary",
       position: {
-        x: START_X + indexAtDepth * X_GAP,
+        x,
         y: START_Y + depth * Y_GAP,
       },
       data: {
@@ -72,7 +80,7 @@ function buildGraphFromRoot(
       });
     }
 
-    node.children?.forEach((child) => traverse(child, nodeId, depth + 1));
+    return x;
   };
 
   traverse(root, null, 0);
@@ -157,6 +165,67 @@ export function buildGraphFromSummaryTree(
     nodeById.set(nodeId, nextNode);
   };
 
+  const shiftSubtree = (rootNodeId: string, deltaX: number, deltaY: number) => {
+    if (deltaX === 0 && deltaY === 0) {
+      return;
+    }
+
+    const queue = [rootNodeId];
+    const visited = new Set<string>();
+
+    while (queue.length > 0) {
+      const nodeId = queue.shift();
+      if (!nodeId || visited.has(nodeId)) {
+        continue;
+      }
+      visited.add(nodeId);
+
+      const nodeIndex = nodeIndexById.get(nodeId);
+      if (nodeIndex !== undefined) {
+        const node = newNodes[nodeIndex];
+        const shiftedNode: FlowNode = {
+          ...node,
+          position: {
+            x: node.position.x + deltaX,
+            y: node.position.y + deltaY,
+          },
+        };
+
+        newNodes[nodeIndex] = shiftedNode;
+        nodeById.set(nodeId, shiftedNode);
+      }
+
+      (outgoingEdgesBySource.get(nodeId) ?? []).forEach((edge) => {
+        if (!visited.has(edge.target)) {
+          queue.push(edge.target);
+        }
+      });
+    }
+  };
+
+  const centerDirectChildren = (parentNode: SummaryNode, childIds: string[]) => {
+    if (childIds.length === 0) {
+      return;
+    }
+
+    const centerOffset = (childIds.length - 1) / 2;
+    childIds.forEach((childId, index) => {
+      const childNode = nodeById.get(childId);
+      if (!childNode || !isSummaryNode(childNode)) {
+        return;
+      }
+
+      const targetX = parentNode.position.x + (index - centerOffset) * X_GAP;
+      const targetY = parentNode.position.y + Y_GAP;
+
+      shiftSubtree(
+        childId,
+        targetX - childNode.position.x,
+        targetY - childNode.position.y,
+      );
+    });
+  };
+
   const mergeChildren = (parentId: string, children: SummaryTree[]) => {
     if (children.length === 0) {
       return;
@@ -168,20 +237,22 @@ export function buildGraphFromSummaryTree(
     }
 
     const existingOutgoingEdges = outgoingEdgesBySource.get(parentId) ?? [];
-    const existingChildIdByTopic = new Map<string, string>();
-    existingOutgoingEdges.forEach((edge) => {
-      const childNode = nodeById.get(edge.target);
-      if (!childNode || !isSummaryNode(childNode)) {
-        return;
-      }
+    const existingSummaryChildren = existingOutgoingEdges
+      .map((edge) => nodeById.get(edge.target))
+      .filter((node): node is SummaryNode => !!node && isSummaryNode(node))
+      .sort((a, b) => a.position.x - b.position.x);
 
+    const orderedChildIds = existingSummaryChildren.map((child) => child.id);
+    const existingChildIdByTopic = new Map<string, string>();
+    existingSummaryChildren.forEach((childNode) => {
       const childTopicKey = normalizeTopic(childNode.data.label);
       if (childTopicKey) {
         existingChildIdByTopic.set(childTopicKey, childNode.id);
       }
     });
 
-    let addedChildCount = 0;
+    const nextMergeTargets: Array<{ childId: string; childChildren: SummaryTree[] }> = [];
+
     children.forEach((child) => {
       const childTopic = child.topic.trim();
       if (!childTopic) {
@@ -194,7 +265,10 @@ export function buildGraphFromSummaryTree(
 
       if (existingChildId) {
         updateSummaryNodeText(existingChildId, childSummary);
-        mergeChildren(existingChildId, child.children ?? []);
+        nextMergeTargets.push({
+          childId: existingChildId,
+          childChildren: child.children ?? [],
+        });
         return;
       }
 
@@ -203,9 +277,7 @@ export function buildGraphFromSummaryTree(
         id: childNodeId,
         type: "summary",
         position: {
-          x:
-            parentNode.position.x +
-            (existingChildIdByTopic.size + addedChildCount) * X_GAP,
+          x: parentNode.position.x,
           y: parentNode.position.y + Y_GAP,
         },
         data: {
@@ -231,8 +303,17 @@ export function buildGraphFromSummaryTree(
         outgoingEdgesBySource.set(parentId, [childEdge]);
       }
 
-      addedChildCount += 1;
-      mergeChildren(childNodeId, child.children ?? []);
+      orderedChildIds.push(childNodeId);
+      existingChildIdByTopic.set(childTopicKey, childNodeId);
+      nextMergeTargets.push({
+        childId: childNodeId,
+        childChildren: child.children ?? [],
+      });
+    });
+
+    centerDirectChildren(parentNode, orderedChildIds);
+    nextMergeTargets.forEach(({ childId, childChildren }) => {
+      mergeChildren(childId, childChildren);
     });
   };
 
