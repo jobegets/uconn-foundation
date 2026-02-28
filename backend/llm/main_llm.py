@@ -1,7 +1,7 @@
 import json
 from typing import Dict
-from generate_summary import generate_summary
-from find_important import find_important
+from .generate_summary import generate_summary
+from .find_important import find_important
 
 class Child:
     def __init__(self, topic, summary) -> None:
@@ -25,7 +25,7 @@ def handle_chat(user_prompt : str):
 
     parent = Parent(parent_topic, parent_summary)
 
-    parent_topics = find_important(parent_summary)[-2:] #DELETE -2
+    parent_topics = find_important(parent_summary)
 
     for topic in parent_topics:
         child_total_summary = generate_summary(topic).split('\n')
@@ -37,6 +37,5 @@ def handle_chat(user_prompt : str):
         
         parent.children.append(child.__dict__)
 
-    json_parent = json.dumps(parent.__dict__, indent=2)
-    return json_parent
+    return parent.__dict__
 

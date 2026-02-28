@@ -1,13 +1,9 @@
 from fastapi import FastAPI
+from llm.main_llm import handle_chat
 
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
+@app.get("/studymap")
+def read_root(prompt: str):
+    return handle_chat(prompt)
