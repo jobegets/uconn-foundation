@@ -25,7 +25,7 @@ CONTEXT : str = (
     "states of matter\n"
 )
 
-def find_important(user_prompt : str):
+def find_important(user_prompt : str) -> list[str]:
     message = []
     message.append({"role": "system", "content": CONTEXT})
     message.append({"role": "user", "content": user_prompt})

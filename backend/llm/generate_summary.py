@@ -16,9 +16,10 @@ CONTEXT : str = (
     "Guidelines:\n"
     " - Make sure to include key foundational terms that the user should know.\n"
     " - Use only ASCII text\n"
+    " - Begin the first line with the subject and the next line will be the entire summary\n"
 )
 
-def generate_summary(user_prompt : str):
+def generate_summary(user_prompt : str) -> str:
     message = []
     message.append({"role": "system", "content": CONTEXT})
     message.append({"role": "user", "content": user_prompt})
@@ -31,7 +32,7 @@ def generate_summary(user_prompt : str):
             temperature=0.4,
         )
 
-        parsed_response = response.choices[0].message.content
+        parsed_response = str(response.choices[0].message.content)
 
         return parsed_response
 
