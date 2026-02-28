@@ -15,7 +15,7 @@ export type SummaryNode = Node<SummaryNodeData>;
 export function SummaryNode({ id, data }: NodeProps<SummaryNode>) {
   // OK I REALIZED HALFWAY I DID NOT NEED NEW CONTEXT ITS LITERALLY PROVIDED BY FLOW
   const { nodes, edges, setNodes, setEdges } = useFlowGraphContext();
-  const { loadingState, setLoadingState } = useToolContext();
+  const { setLoadingState } = useToolContext();
   const [isOpen, setIsOpen] = useState(false);
   const [editingField, setEditingField] = useState<"label" | "summary" | null>(
     null,

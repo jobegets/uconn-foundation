@@ -11,7 +11,7 @@ import { useToolContext } from "../../context/useToolContext";
 
 function ChatWindow() {
   const { nodes, edges, setNodes, setEdges } = useFlowGraphContext();
-  const { loadingState, setLoadingState } = useToolContext();
+  const { setLoadingState } = useToolContext();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
