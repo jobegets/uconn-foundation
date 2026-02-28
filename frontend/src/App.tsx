@@ -9,6 +9,7 @@ import { useToolContext } from "./context/useToolContext";
 function App() {
   const { activeTool, setActiveTool } = useToolContext();
 
+  // key event listener for setting our active tool
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
       const focusedTag = (event.target as HTMLElement | null)?.tagName;
