@@ -1,9 +1,8 @@
-import { useCallback, useMemo, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useRef, useState, type MouseEvent } from "react";
 import {
   ReactFlow,
   Background,
   Controls,
-  MarkerType,
   addEdge,
   useEdgesState,
   useNodesState,
