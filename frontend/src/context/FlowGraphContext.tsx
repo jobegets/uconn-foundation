@@ -16,12 +16,20 @@ type FlowGraphProviderProps = {
 };
 
 export function FlowGraphProvider({ children }: FlowGraphProviderProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<FlowNode>(initialNodes);
+  const [nodes, setNodes, onNodesChange] =
+    useNodesState<FlowNode>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   return (
     <FlowGraphContext.Provider
-      value={{ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }}
+      value={{
+        nodes,
+        setNodes,
+        onNodesChange,
+        edges,
+        setEdges,
+        onEdgesChange,
+      }}
     >
       {children}
     </FlowGraphContext.Provider>

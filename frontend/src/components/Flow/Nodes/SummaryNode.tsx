@@ -1,17 +1,19 @@
 import { useState } from "react";
+import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
+import { ChevronDoubleDownIcon } from "@heroicons/react/16/solid";
+import { useFlowGraphContext } from "../../../context/useFlowGraphContext";
+import { getStudyMapChildren } from "../../../api";
 import {
-  Handle,
-  Position,
-  useReactFlow,
-  type NodeProps,
-  type Node,
-} from "@xyflow/react";
+  buildGraphFromSummaryTree,
+  type SummaryTree,
+} from "../../../helpers/treeHelpers";
 
 type SummaryNodeData = { label: string; summary: string };
 export type SummaryNode = Node<SummaryNodeData>;
 
 export function SummaryNode({ id, data }: NodeProps<SummaryNode>) {
-  const { setNodes } = useReactFlow();
+  // OK I REALIZED HALFWAY I DID NOT NEED NEW CONTEXT ITS LITERALLY PROVIDED BY FLOW
+  const { nodes, edges, setNodes, setEdges } = useFlowGraphContext();
   const [isOpen, setIsOpen] = useState(false);
   const [editingField, setEditingField] = useState<"label" | "summary" | null>(
     null,
@@ -33,7 +35,7 @@ export function SummaryNode({ id, data }: NodeProps<SummaryNode>) {
             label:
               field === "label"
                 ? draftLabel.trim() || "Summary"
-                : String(node.data.label ?? "Summary"),
+                : String((node.data as SummaryNodeData).label ?? "Summary"),
             summary:
               field === "summary"
                 ? draftSummary.trim() || "Empty summary"
@@ -46,6 +48,24 @@ export function SummaryNode({ id, data }: NodeProps<SummaryNode>) {
     setEditingField((currentField) =>
       currentField === field ? null : currentField,
     );
+  };
+
+  const handleSpawnChildren = async () => {
+    const prompt = `What is ${data.label.trim()}`;
+    if (!prompt) {
+      return;
+    }
+
+    const resTree = (await getStudyMapChildren(prompt)) as SummaryTree;
+
+    const { newNodes, newEdges } = buildGraphFromSummaryTree(
+      nodes,
+      edges,
+      resTree,
+    );
+
+    setNodes(newNodes);
+    setEdges(newEdges);
   };
 
   return (
@@ -78,6 +98,9 @@ export function SummaryNode({ id, data }: NodeProps<SummaryNode>) {
             {data.label || "Summary"}
           </span>
         )}
+        <button onClick={handleSpawnChildren}>
+          <ChevronDoubleDownIcon width={20} height={20} />
+        </button>
       </div>
       <details
         className="summary-node__dropdown"
