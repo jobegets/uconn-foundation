@@ -4,6 +4,7 @@ Foundation is an AI-powered structured learning tool designed to break down comp
 
 Built in 20 hours at HackUConn 2026, the project focuses on transforming LLM output into deterministic, structured knowledge graphs suitable for learning applications.
 
+![ezgif-54838fff3bb32c47](https://github.com/user-attachments/assets/b91963f5-8a9b-47c4-b9b1-7759d17785aa)
 
 
 ## Problem
